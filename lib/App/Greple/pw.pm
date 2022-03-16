@@ -489,7 +489,8 @@ sub _js {
     goto &js_chrome;
 }
 
-sub js_chrome {
+sub js_google {
+    my $brouse = shift;
     my $js = shift;
     $js =~ s/"/\\"/g;
     $js =~ s/\n//g;
@@ -498,7 +499,15 @@ sub js_chrome {
 	    execute javascript ("$js")
 	end tell
     end_script
-    apple_script 'Google Chrome', $script;
+    apple_script $browser, $script;
+}
+
+sub js_chrome {
+    js_google('Google Chrome', @_);
+}
+
+sub js_brave {
+    js_google('Google Brave', @_);
 }
 
 sub js_safari {
