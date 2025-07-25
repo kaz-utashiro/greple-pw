@@ -438,7 +438,7 @@ sub copy {
     elsif ($clipboard eq "Clipboard") {
 	Clipboard->copy($text);
     }
-    elsif ($clipboard = "pbcopy") {
+    elsif ($clipboard eq "pbcopy") {
 	dumpto($clipboard, $text);
     }
     1;
@@ -490,7 +490,7 @@ sub _js {
 }
 
 sub js_google {
-    my $brouse = shift;
+    my $browser = shift;
     my $js = shift;
     $js =~ s/"/\\"/g;
     $js =~ s/\n//g;
