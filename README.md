@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/kaz-utashiro/greple-pw/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-pw/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-pw.svg)](https://metacpan.org/release/App-Greple-pw)
 # NAME
 
 pw - Module to get password from file
