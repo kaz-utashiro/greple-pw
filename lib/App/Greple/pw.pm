@@ -142,7 +142,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright (C) 2017-2020 Kazumasa Utashiro.
+Copyright (C) 2017-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

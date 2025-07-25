@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,10 +42,10 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "0",
+            "App::Greple" : "9.23",
             "Clipboard" : "0",
-            "Getopt::EX" : "v1.2.1",
-            "perl" : "v5.14.0"
+            "Getopt::EX" : "v2.2.2",
+            "perl" : "v5.18.2"
          }
       },
       "test" : {
@@ -62,7 +62,7 @@
       "homepage" : "https://github.com/kaz-utashiro/greple-pw",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/kaz-utashiro/greple-pw.git",
+         "url" : "https://github.com/kaz-utashiro/greple-pw.git",
          "web" : "https://github.com/kaz-utashiro/greple-pw"
       }
    },
@@ -71,6 +71,6 @@
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

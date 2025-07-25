@@ -120,7 +120,7 @@ this as well:
 
 # SEE ALSO
 
-[App::Greple](https://metacpan.org/pod/App::Greple), [App::Greple::pw](https://metacpan.org/pod/App::Greple::pw)
+[App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [App::Greple::pw](https://metacpan.org/pod/App%3A%3AGreple%3A%3Apw)
 
 [https://github.com/kaz-utashiro/greple-pw](https://github.com/kaz-utashiro/greple-pw)
 
@@ -130,7 +130,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright (C) 2017-2020 Kazumasa Utashiro.
+Copyright (C) 2017-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
