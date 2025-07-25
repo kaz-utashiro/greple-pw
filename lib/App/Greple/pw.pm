@@ -1,6 +1,6 @@
 package App::Greple::pw;
 
-our $VERSION = "0.01";
+our $VERSION = "1.00";
 
 =head1 NAME
 
