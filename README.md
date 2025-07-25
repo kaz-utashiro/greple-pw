@@ -9,7 +9,7 @@ greple -Mpw pattern file
 
 # VERSION
 
-0.01
+Version 1.00
 
 # DESCRIPTION
 

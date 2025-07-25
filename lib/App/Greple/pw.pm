@@ -14,7 +14,7 @@ greple -Mpw pattern file
 
 =head1 VERSION
 
-0.01
+Version 1.00
 
 
 =head1 DESCRIPTION
