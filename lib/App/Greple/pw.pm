@@ -19,8 +19,8 @@ Version 1.00
 
 =head1 DESCRIPTION
 
-This module searches id and password information those written in text
-file, and displays them interactively.  Passwords are not shown on
+This module searches for ID and password information written in text
+files, and displays them interactively.  Passwords are not shown on
 display by default, but you can copy them into clipboard by specifying
 item mark.
 
@@ -38,9 +38,9 @@ Id and password is collected from text using some keywords like
 "user", "account", "password", "pin" and so on.  To see actual data,
 use B<pw_status> function described below.
 
-Some bank use random number matrix as a countermeasure for tapping.
-If the module successfully guessed the matrix area, it blackout the
-table and remember them.
+Some banks use random number matrices as a countermeasure for tapping.
+If the module successfully guesses the matrix area, it blacks out the
+table and remembers them.
 
     | A B C D E F G H I J
   --+--------------------
@@ -50,7 +50,7 @@ table and remember them.
   3 | 7 F A X 9 B D Y O A
   4 | S D 2 2 Q V J 5 4 T
 
-Enter the field position to get the cell items like:
+Enter the field positions to get the cell items like:
 
     > E3 I0 C4
 
@@ -70,13 +70,13 @@ this as well:
 
 =item B<pw_print>
 
-Data print function.  This function is set for B<--print> option of
-B<greple> by default, and user doesn't have to care about it.
+Data print function.  This function is set for the B<--print> option of
+B<greple> by default, and users don't have to care about it.
 
 =item B<pw_epilogue>
 
-Epilogue function.  This function is set for B<--end> option of
-B<greple> by default, and user doesn't have to care about it.
+Epilogue function.  This function is set for the B<--end> option of
+B<greple> by default, and users don't have to care about it.
 
 =item B<pw_option>
 
@@ -114,12 +114,12 @@ Currently following options are available:
     pw_blackout
     debug
 
-Password is not blacked out when B<pw_blackout> is 0.  If it is 1, all
+Passwords are not blacked out when B<pw_blackout> is 0.  If it is 1, all
 password characters are replaced by 'x'.  If it is greater than 1,
-password is replaced by sequence of 'x' indicated by that number.
+passwords are replaced by a sequence of 'x' characters of that length.
 
-B<id_keys> and B<pw_keys> are list, and list members are separated by
-whitespaces.  When the value start with 'B<+>' mark, it is appended to
+B<id_keys> and B<pw_keys> are lists, and list members are separated by
+whitespaces.  When the value starts with the 'B<+>' mark, it is appended to the
 current list.
 
 =item B<pw_status>
