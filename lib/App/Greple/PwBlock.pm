@@ -7,6 +7,7 @@ use utf8;
 use List::Util qw(sum reduce);
 use Data::Dumper;
 use Getopt::EX::Colormap qw(colorize);
+use Getopt::EX::Config qw(config);
 
 sub new {
     my $class = shift;
@@ -55,16 +56,13 @@ sub orig   { $_[0]->{orig}   }
 sub masked { $_[0]->{masked} }
 sub matrix { $_[0]->{matrix} }
 
-our $parse_matrix = 1;
-our $parse_id = 1;
-our $parse_pw = 1;
 
 sub parse {
     my $obj = shift;
     $obj->{orig} = $obj->{masked} = shift;
-    $obj->parse_matrix if $parse_matrix;
-    $obj->parse_pw if $parse_pw;
-    $obj->parse_id if $parse_id;
+    $obj->parse_matrix if config('parse_matrix');
+    $obj->parse_pw if config('parse_pw');
+    $obj->parse_id if config('parse_id');
     $obj;
 }
     
@@ -78,46 +76,51 @@ sub make_pattern {
     qr{ ^\s*+ (?!@except) .*? (?:@match)\w*[:=]? [\ \t]* \K ( .* ) }mxi;
 }
 
-our $id_keys = join(' ', 
-    qw(ID ACCOUNT USER CODE NUMBER URL),
-    qw(ユーザ アカウント コード 番号),
-    );
-our $id_chars = '[\w\.\-\@]';
-our $id_color = 'K/455';
-our $id_label_color = 'S;C/555';
+# Getopt::EX::Config support
+our $config = Getopt::EX::Config->new(
+    parse_matrix    => 1,
+    parse_id        => 1,
+    parse_pw        => 1,
+    id_keys         => join(' ', 
+        qw(ID ACCOUNT USER CODE NUMBER URL),
+        qw(ユーザ アカウント コード 番号),
+        ),
+    id_chars        => '[\w\.\-\@]',
+    id_color        => 'K/455',
+    id_label_color  => 'S;C/555',
+    pw_keys         => join(' ',
+        qw(PASS PIN),
+        qw(パス 暗証),
+        ),
+    pw_chars        => '\S',
+    pw_color        => 'K/545',
+    pw_label_color  => 'S;M/555',
+    pw_blackout     => 1,
+);
 
 sub parse_id {
     shift->parse_xx(
 	hash => 'id',
-	pattern => make_pattern(split /\s+/, $id_keys),
-	chars => $id_chars,
+	pattern => make_pattern(split /\s+/, config('id_keys')),
+	chars => config('id_chars'),
 	start_label => '0',
 	label_format => '[%s]',
-	color => $id_color,
-	label_color => $id_label_color,
+	color => config('id_color'),
+	label_color => config('id_label_color'),
 	blackout => 0,
 	);
 }		   
 
-our $pw_keys = join(' ',
-    qw(PASS PIN),
-    qw(パス 暗証),
-    );
-our $pw_chars = '\S';
-our $pw_color = 'K/545';
-our $pw_label_color = 'S;M/555';
-our $pw_blackout = 1;
-
 sub parse_pw {
     shift->parse_xx(
 	hash => 'pw',
-	pattern => make_pattern({IGNORE => [ 'URL' ]}, split /\s+/, $pw_keys),
-	chars => $pw_chars,
+	pattern => make_pattern({IGNORE => [ 'URL' ]}, split /\s+/, config('pw_keys')),
+	chars => config('pw_chars'),
 	start_label => 'a',
 	label_format => '[%s]',
-	color => $pw_color,
-	label_color => $pw_label_color,
-	blackout => $pw_blackout,
+	color => config('pw_color'),
+	label_color => config('pw_label_color'),
+	blackout => config('pw_blackout'),
 	);
 }		   
 

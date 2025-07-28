@@ -313,19 +313,19 @@ my $config = Getopt::EX::Config->new(
     browser         => 'chrome',
     timeout         => 300,
     debug           => 0,
-    # PwBlock parameters - direct references to PwBlock variables
-    parse_matrix    => \$App::Greple::PwBlock::parse_matrix,
-    parse_id        => \$App::Greple::PwBlock::parse_id,
-    parse_pw        => \$App::Greple::PwBlock::parse_pw,
-    id_keys         => \$App::Greple::PwBlock::id_keys,
-    id_chars        => \$App::Greple::PwBlock::id_chars,
-    id_color        => \$App::Greple::PwBlock::id_color,
-    id_label_color  => \$App::Greple::PwBlock::id_label_color,
-    pw_keys         => \$App::Greple::PwBlock::pw_keys,
-    pw_chars        => \$App::Greple::PwBlock::pw_chars,
-    pw_color        => \$App::Greple::PwBlock::pw_color,
-    pw_label_color  => \$App::Greple::PwBlock::pw_label_color,
-    pw_blackout     => \$App::Greple::PwBlock::pw_blackout,
+    # PwBlock parameters - direct references to PwBlock config members
+    parse_matrix    => \$App::Greple::PwBlock::config->{parse_matrix},
+    parse_id        => \$App::Greple::PwBlock::config->{parse_id},
+    parse_pw        => \$App::Greple::PwBlock::config->{parse_pw},
+    id_keys         => \$App::Greple::PwBlock::config->{id_keys},
+    id_chars        => \$App::Greple::PwBlock::config->{id_chars},
+    id_color        => \$App::Greple::PwBlock::config->{id_color},
+    id_label_color  => \$App::Greple::PwBlock::config->{id_label_color},
+    pw_keys         => \$App::Greple::PwBlock::config->{pw_keys},
+    pw_chars        => \$App::Greple::PwBlock::config->{pw_chars},
+    pw_color        => \$App::Greple::PwBlock::config->{pw_color},
+    pw_label_color  => \$App::Greple::PwBlock::config->{pw_label_color},
+    pw_blackout     => \$App::Greple::PwBlock::config->{pw_blackout},
 );
 
 sub finalize {
