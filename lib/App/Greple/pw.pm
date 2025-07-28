@@ -4,12 +4,20 @@ our $VERSION = "1.00";
 
 =head1 NAME
 
-pw - Module to get password from file
+pw - Interactive password and ID information extractor for greple
 
 
 =head1 SYNOPSIS
 
-greple -Mpw pattern file
+    # Basic usage
+    greple -Mpw pattern file
+
+    # Search in encrypted files
+    greple -Mpw password ~/secure/*.gpg
+
+    # Configure options
+    greple -Mpw --no-clear-screen --chrome password data.txt
+    greple -Mpw --config timeout=600 --config debug=1 password file.txt
 
 
 =head1 VERSION
@@ -19,24 +27,45 @@ Version 1.00
 
 =head1 DESCRIPTION
 
-This module searches for ID and password information written in text
-files, and displays them interactively.  Passwords are not shown on
-display by default, but you can copy them into clipboard by specifying
-item mark.
+The B<pw> module is a B<greple> extension that provides secure, interactive
+handling of sensitive information such as passwords, user IDs, and account
+details found in text files. It is designed with security in mind, ensuring
+that sensitive data doesn't remain visible on screen or in terminal history.
 
-PGP encrypted file can be handled by B<greple> standard feature.
-Command "B<gpg>" is invoked for files with "I<.gpg>" suffix by
-default.  Option B<--pgp> is also available, then you can type
-passphrase only once for searching from multiple files.  Consult
-B<--if> option if you are using other encryption style.
+=head2 Key Features
 
-Terminal scroll buffer and screen is cleared when command exits, and
-content of clipboard is replaced by prepared string, so that important
-information does not remain on the terminal.
+=over 4
 
-Id and password is collected from text using some keywords like
-"user", "account", "password", "pin" and so on.  To see actual data,
-use B<pw_status> function described below.
+=item * B<Interactive password handling>
+
+Passwords are masked by default and can be safely copied to clipboard
+without displaying the actual content on screen.
+
+=item * B<Secure cleanup>
+
+Terminal scroll buffer and screen are automatically cleared when the
+command exits, and clipboard content is replaced with a harmless string
+to prevent sensitive information from persisting.
+
+=item * B<Encrypted file support>
+
+Seamlessly works with PGP encrypted files using B<greple>'s standard
+features. Files with "I<.gpg>" extension are automatically decrypted,
+and the B<--pgp> option allows entering the passphrase once for
+multiple files.
+
+=item * B<Intelligent pattern recognition>
+
+Automatically detects ID and password information using configurable
+keywords like "user", "account", "password", "pin", etc. Custom
+keywords can be configured to match your specific data format.
+
+=item * B<Browser integration>
+
+Includes browser automation features for automatically filling web
+forms with extracted credentials.
+
+=back
 
 Some banks use random number matrices as a countermeasure for tapping.
 If the module successfully guesses the matrix area, it blacks out the
@@ -66,6 +95,10 @@ this as well:
 
 =head1 INTERFACE
 
+=begin comment
+
+=head2 Internal Functions (for developers)
+
 =over 7
 
 =item B<pw_print>
@@ -78,21 +111,42 @@ B<greple> by default, and users don't have to care about it.
 Epilogue function.  This function is set for the B<--end> option of
 B<greple> by default, and users don't have to care about it.
 
+=back
+
+=end comment
+
+=over 7
+
 =item B<config>
 
 Module parameters can be configured using the B<config> interface from
-L<Getopt::EX::Config>.  If you do not want to clear screen after command
-execution, you can set it like:
+L<Getopt::EX::Config>.  There are three ways to configure parameters:
+
+=over 4
+
+=item Module configuration syntax
+
+Use the B<::config=> syntax directly with the module:
 
     greple -Mpw::config=clear_screen=0
 
-or:
+=item Command-line config option
+
+Use the B<--config> option to set parameters:
 
     greple -Mpw --config clear_screen=0 --
 
-or as a command-line option:
+Multiple parameters can be set:
 
-    greple -Mpw --no-clear-screen --
+    greple -Mpw --config clear_screen=0 --config debug=1 --
+
+=item Direct command-line options
+
+Many parameters have direct command-line equivalents:
+
+    greple -Mpw --no-clear-screen --debug --browser=safari --
+
+=back
 
 Currently following configuration options are available:
 
@@ -117,11 +171,42 @@ Currently following configuration options are available:
     pw_label_color
     pw_blackout
 
-These parameters can also be used as command-line options with underscores 
-replaced by hyphens (e.g., B<--parse-matrix>, B<--id-keys>).
+=back
 
-B<id_keys> and B<pw_keys> are lists of keywords separated by spaces.
-B<pw_blackout> controls password display: 0=show, 1=mask with 'x', >1=fixed length mask.
+=head3 Parameter Details
+
+=over 4
+
+=item B<Option naming>
+
+Configuration parameters use underscores (C<clear_screen>, C<id_keys>), while 
+command-line options use hyphens (C<--clear-screen>, C<--id-keys>).
+
+=item B<Boolean parameters>
+
+Parameters like B<clear_screen>, B<debug> can be set to 0/1. Command-line 
+options support negation with C<--no-> prefix (e.g., C<--no-clear-screen>).
+
+=item B<List parameters>
+
+B<id_keys> and B<pw_keys> are lists of keywords separated by spaces:
+
+    --config id_keys="USER ACCOUNT LOGIN EMAIL"
+    --config pw_keys="PASS PASSWORD PIN SECRET"
+
+=item B<Password display control>
+
+B<pw_blackout> controls password display:
+0=show passwords, 1=mask with 'x', >1=fixed length mask.
+
+=item B<PwBlock integration>
+
+Parameters B<parse_matrix>, B<parse_id>, B<parse_pw>, B<id_*>, and B<pw_*> 
+are passed to the PwBlock module for pattern recognition and display control.
+
+=back
+
+=over 4
 
 =item B<pw_status>
 
@@ -130,6 +215,53 @@ Print current configuration status. Next command displays current settings:
     greple -Mpw::pw_status= dummy /dev/null
 
 This shows which parameters are set to non-default values and which are using defaults.
+
+=back
+
+=head1 BROWSER INTEGRATION
+
+The pw module includes browser integration features for automated input.
+Browser options are available:
+
+=over 4
+
+=item B<--browser>=I<name>
+
+Set the browser for automation (chrome, safari, etc.):
+
+    greple -Mpw --browser=chrome
+
+=item B<--chrome>, B<--safari>
+
+Shortcut options for specific browsers:
+
+    greple -Mpw --chrome     # equivalent to --browser=chrome
+    greple -Mpw --safari     # equivalent to --browser=safari
+
+=back
+
+During interactive mode, you can use the C<input> command to send
+data to browser forms automatically.
+
+=head1 EXAMPLES
+
+=over 4
+
+=item Search for passwords in encrypted files
+
+    greple -Mpw password ~/secure/*.gpg
+
+=item Use with specific browser and no screen clearing
+
+    greple -Mpw --chrome --no-clear-screen password data.txt
+
+=item Configure custom keywords and timeout
+
+    greple -Mpw --config id_keys="LOGIN EMAIL USER" --config timeout=600 password file.txt
+
+=item Check current configuration
+
+    greple -Mpw::pw_status= dummy /dev/null
 
 =back
 

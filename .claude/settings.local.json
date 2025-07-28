@@ -3,7 +3,8 @@
     "allow": [
       "Bash(perl:*)",
       "Bash(minil test:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pod2text:*)"
     ],
     "deny": []
   }
