@@ -1,4 +1,4 @@
-use v5.24;
+use v5.18;
 use utf8;
 use Test::More;
 use Data::Dumper;
