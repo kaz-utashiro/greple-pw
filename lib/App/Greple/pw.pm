@@ -78,20 +78,19 @@ B<greple> by default, and users don't have to care about it.
 Epilogue function.  This function is set for the B<--end> option of
 B<greple> by default, and users don't have to care about it.
 
-=item B<pw_option>
+=item B<config>
 
-Several parameters can be set by B<pw_option> function.  If you do not
-want to clear screen after command execution, call B<pw_option> like:
+Module parameters can be configured using the B<config> interface from
+L<Getopt::EX::Config>.  If you do not want to clear screen after command
+execution, you can set it like:
 
-    greple -Mpw::pw_option(clear_screen=0)
+    greple -Mpw::config=clear_screen=0
 
 or:
 
-    greple -Mpw --begin pw_option(clear_screen=0)
+    greple -Mpw --config clear_screen=0 --
 
-with appropriate quotation.
-
-Currently following options are available:
+Currently following configuration options are available:
 
     clear_clipboard
     clear_string
@@ -100,6 +99,7 @@ Currently following options are available:
     goto_home
     browser
     timeout
+    debug
     parse_matrix
     parse_id
     parse_pw
@@ -112,21 +112,17 @@ Currently following options are available:
     pw_color
     pw_label_color
     pw_blackout
-    debug
 
-Passwords are not blacked out when B<pw_blackout> is 0.  If it is 1, all
-password characters are replaced by 'x'.  If it is greater than 1,
-passwords are replaced by a sequence of 'x' characters of that length.
-
-B<id_keys> and B<pw_keys> are lists, and list members are separated by
-whitespaces.  When the value starts with the 'B<+>' mark, it is appended to the
-current list.
+B<id_keys> and B<pw_keys> are lists of keywords separated by spaces.
+B<pw_blackout> controls password display: 0=show, 1=mask with 'x', >1=fixed length mask.
 
 =item B<pw_status>
 
-Print option status.  Next command displays defaults.
+Print current configuration status. Next command displays current settings:
 
     greple -Mpw::pw_status= dummy /dev/null
+
+This shows which parameters are set to non-default values and which are using defaults.
 
 =back
 
@@ -156,7 +152,7 @@ use warnings;
 use utf8;
 
 use Exporter 'import';
-our @EXPORT      = qw(&pw_print &pw_epilogue &pw_option &pw_status);
+our @EXPORT      = qw(&pw_print &pw_epilogue &pw_status);
 our %EXPORT_TAGS = ( );
 our @EXPORT_OK   = qw();
 
@@ -164,8 +160,88 @@ use Carp;
 use Data::Dumper;
 use App::Greple::Common;
 use App::Greple::PwBlock;
+use Getopt::EX::Config qw(config);
 
 my $execution = 0;
+
+# Getopt::EX::Config support
+my $config = Getopt::EX::Config->new(
+    clear_clipboard => 1,
+    clear_string    => 'Hasta la vista.',
+    clear_screen    => 1,
+    clear_buffer    => 1,
+    goto_home       => 0,
+    browser         => 'chrome',
+    timeout         => 300,
+    debug           => 0,
+    # PwBlock parameters (no defaults - PwBlock manages its own)
+    parse_matrix    => undef,
+    parse_id        => undef,
+    parse_pw        => undef,
+    id_keys         => undef,
+    id_chars        => undef,
+    id_color        => undef,
+    id_label_color  => undef,
+    pw_keys         => undef,
+    pw_chars        => undef,
+    pw_color        => undef,
+    pw_label_color  => undef,
+    pw_blackout     => undef,
+);
+
+sub finalize {
+    our($mod, $argv) = @_;
+    $config->deal_with(
+	$argv,
+	"clear_clipboard!",
+	"clear_string=s",
+	"clear_screen!",
+	"clear_buffer!",
+	"goto_home!",
+	"browser=s",
+	"timeout=i",
+	"debug!",
+	# PwBlock parameters
+	"parse_matrix!",
+	"parse_id!",
+	"parse_pw!",
+	"id_keys=s",
+	"id_chars=s",
+	"id_color=s",
+	"id_label_color=s",
+	"pw_keys=s",
+	"pw_chars=s",
+	"pw_color=s",
+	"pw_label_color=s",
+	"pw_blackout=i",
+    );
+    
+    # Sync only explicitly set config values with PwBlock module variables
+    $App::Greple::PwBlock::parse_matrix    = config('parse_matrix')    if defined config('parse_matrix');
+    $App::Greple::PwBlock::parse_id        = config('parse_id')        if defined config('parse_id');
+    $App::Greple::PwBlock::parse_pw        = config('parse_pw')        if defined config('parse_pw');
+    @App::Greple::PwBlock::id_keys         = split /\s+/, config('id_keys')         if defined config('id_keys');
+    $App::Greple::PwBlock::id_chars        = config('id_chars')        if defined config('id_chars');
+    $App::Greple::PwBlock::id_color        = config('id_color')        if defined config('id_color');
+    $App::Greple::PwBlock::id_label_color  = config('id_label_color')  if defined config('id_label_color');
+    @App::Greple::PwBlock::pw_keys         = split /\s+/, config('pw_keys')         if defined config('pw_keys');
+    $App::Greple::PwBlock::pw_chars        = config('pw_chars')        if defined config('pw_chars');
+    $App::Greple::PwBlock::pw_color        = config('pw_color')        if defined config('pw_color');
+    $App::Greple::PwBlock::pw_label_color  = config('pw_label_color')  if defined config('pw_label_color');
+    $App::Greple::PwBlock::pw_blackout     = config('pw_blackout')     if defined config('pw_blackout');
+}
+
+sub pw_status {
+    binmode STDOUT, ":encoding(utf8)";
+    for my $key (sort keys %{$config}) {
+	my $val = config($key);
+	if (defined $val) {
+	    print "$key: $val\n";
+	} else {
+	    print "$key: (default)\n";
+	}
+    }
+}
 
 sub pw_print {
     my %attr = @_;
@@ -182,81 +258,19 @@ sub pw_print {
     return '';
 }
 
-our $debug = 0;
-our $clear_clipboard = 1;
-our $clear_string = 'Hasta la vista.';
-our $clear_screen = 1;
-our $clear_buffer = 1;
-our $goto_home = 0;
-our $browser = 'chrome';
-our $timeout = 300;
-
-my @flags = (
-    clear_clipboard => \$clear_clipboard,
-    clear_string    => \$clear_string,
-    clear_screen    => \$clear_screen,
-    clear_buffer    => \$clear_buffer,
-    goto_home       => \$goto_home,
-    browser         => \$browser,
-    timeout         => \$timeout,
-    parse_matrix    => \$App::Greple::PwBlock::parse_matrix,
-    parse_id        => \$App::Greple::PwBlock::parse_id,
-    parse_pw        => \$App::Greple::PwBlock::parse_pw,
-    id_keys         => \@App::Greple::PwBlock::id_keys,
-    id_chars        => \$App::Greple::PwBlock::id_chars,
-    id_color        => \$App::Greple::PwBlock::id_color,
-    id_label_color  => \$App::Greple::PwBlock::id_label_color,
-    pw_keys         => \@App::Greple::PwBlock::pw_keys,
-    pw_chars        => \$App::Greple::PwBlock::pw_chars,
-    pw_color        => \$App::Greple::PwBlock::pw_color,
-    pw_label_color  => \$App::Greple::PwBlock::pw_label_color,
-    pw_blackout     => \$App::Greple::PwBlock::pw_blackout,
-    debug           => \$debug,
-    );
-my %flags = @flags;
-my @label = @flags[grep { $_ % 2 == 0 } 0 .. $#flags];
-
-sub pw_option {
-    my %arg = @_;
-    delete $arg{&FILELABEL}; # no entry when called from -M otption.
-
-    while (my($k, $v) = each %arg) {
-	my $target = $flags{$k};
-	if (not defined $target) {
-	    warn "$k: Option unknown.\n";
-	    next;
-	}
-	if (ref $target eq 'ARRAY') {
-	    $v =~ s/^\+// or @$target = ();
-	    push @$target, split /\s+/, $v;
-	} else {
-	    $$target = $v;
-	}
-    }
-}
-
-sub pw_status {
-    binmode STDOUT, ":encoding(utf8)";
-    for my $key (@label) {
-	my $val = $flags{$key};
-	print($key, ": ",
-	      ref $val eq 'ARRAY' ? "@$val" : $$val,
-	      "\n");
-    }
-}
 
 use constant { CSI => "\e[" };
 
 sub pw_epilogue {
     $execution == 0 and return;
-    copy($clear_string) if $clear_clipboard;
-    print STDERR CSI, "H" if $goto_home;
-    print STDERR CSI, "2J" if $clear_screen;
-    print STDERR CSI, "3J" if $clear_buffer;
+    copy(config('clear_string')) if config('clear_clipboard');
+    print STDERR CSI, "H" if config('goto_home');
+    print STDERR CSI, "2J" if config('clear_screen');
+    print STDERR CSI, "3J" if config('clear_buffer');
 }
 
 sub pw_timeout {
-    if ($debug) {
+    if (config('debug')) {
 	warn "pw_timeout() called.\n";
 	sleep 1;
     }
@@ -276,10 +290,10 @@ sub command_loop {
     binmode STDOUT, ":encoding(utf8)";
 
     while ($_ = $term->readline("> ")) {
-	if ($timeout) {
+	if (config('timeout')) {
 	    $SIG{ALRM} = \&pw_timeout;
-	    alarm $timeout;
-	    warn "Set timeout to $timeout seconds\n" if $debug;
+	    alarm config('timeout');
+	    warn "Set timeout to ", config('timeout'), " seconds\n" if config('debug');
 	}
 	/\S/ or next;
 	$term->addhistory($_);
@@ -337,7 +351,7 @@ sub command_loop {
 		}
 		$pw->orig =~ /^INPUT\s+(.+)/mg;
 	    };
-	    warn Dumper \%field if $debug;
+	    warn Dumper \%field if config('debug');
 	    my @arg = do {
 		map { /^([a-z]\d\s*){2,}$/i ? /([a-z]\d)/gi : $_ }
 		map { m{^/(.+)/$} ? get_pattern($1) : $_ }
@@ -346,7 +360,7 @@ sub command_loop {
 		map { $field{$_} or $_ }
 		split /\s+/;
 	    };
-	    warn "@arg\n" if $debug;
+	    warn "@arg\n" if config('debug');
 	    while (@arg >= 2) {
 		my $label = shift @arg;
 		my @fields = split /[,]/, $label;
@@ -358,29 +372,16 @@ sub command_loop {
 	    }
 	}
 	elsif (/^set$/) {
-	    for my $var (sort keys %flags) {
+	    for my $var (sort keys %{$config}) {
 		print "$var: ";
-		if (ref $flags{$var} eq 'SCALAR') {
-		    print ${$flags{$var}};
-		} else {
-		    my @val = @{$flags{$var}};
-		    print qq("@val");
-		}
+		print config($var);
 		print "\n";
 	    }
 	}
 	elsif (s/^set\s+//) {
 	    my($var, $val) = split /\s+/, $_, 2;
-	    if (my $ref = $flags{$var}) {
-		if (ref $ref eq 'SCALAR') {
-		    $$ref = $val;
-		}
-		elsif (ref $ref eq 'ARRAY') {
-		    @$ref = split /\s+/, $val;
-		}
-		else {
-		    die;
-		}
+	    if (exists $config->{$var}) {
+		$config->set($var, $val);
 	    } else {
 		warn "Unknown variable: $var";
 	    }
@@ -461,13 +462,13 @@ sub apple_script {
 	    $do
 	end tell
     end_script
-    warn $script if $debug;
+    warn $script if config('debug');
     if ((open(CMD, "-|") // die) == 0) {
 	exec 'osascript', '-e', $script or die;
     } else {
 	my $result = do { local $/; <CMD> };
 	close CMD;
-	warn $result if $debug;
+	warn $result if config('debug');
 	return $result =~ /missing value/ ? undef : $result;
     }
 }
@@ -478,8 +479,8 @@ my %js_subs = (
     );
 
 sub js {
-    (my $sub = $js_subs{$browser}) // do {
-	warn "Unsupported browser: $browser";
+    (my $sub = $js_subs{config('browser')}) // do {
+	warn "Unsupported browser: ", config('browser');
 	return;
     };
     goto $sub;
@@ -499,7 +500,7 @@ sub js_google {
 	    execute javascript ("$js")
 	end tell
     end_script
-    apple_script $browser, $script;
+    apple_script config('browser'), $script;
 }
 
 sub js_chrome {
@@ -542,12 +543,10 @@ option default \
 	--print pw_print \
 	--end pw_epilogue
 
-option --pw_option --begin pw_option($<shift>=$<shift>)
+option --debug --config debug
 
-option --debug --pw_option debug 1
+option --timeout --config timeout
 
-option --timeout --pw_option timeout
-
-option --browser --pw_option browser
-option --chrome --browser chrome
-option --safari --browser safari
+option --browser --config browser
+option --chrome --config browser=chrome
+option --safari --config browser=safari
