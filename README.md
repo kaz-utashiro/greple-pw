@@ -17,7 +17,7 @@ pw - Interactive password and ID information extractor for greple
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
