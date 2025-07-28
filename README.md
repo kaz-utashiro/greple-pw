@@ -69,20 +69,23 @@ this as well:
     Epilogue function.  This function is set for the **--end** option of
     **greple** by default, and users don't have to care about it.
 
-- **pw\_option**
+- **config**
 
-    Several parameters can be set by **pw\_option** function.  If you do not
-    want to clear screen after command execution, call **pw\_option** like:
+    Module parameters can be configured using the **config** interface from
+    [Getopt::EX::Config](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AConfig).  If you do not want to clear screen after command
+    execution, you can set it like:
 
-        greple -Mpw::pw_option(clear_screen=0)
+        greple -Mpw::config=clear_screen=0
 
     or:
 
-        greple -Mpw --begin pw_option(clear_screen=0)
+        greple -Mpw --config clear_screen=0 --
 
-    with appropriate quotation.
+    or as a command-line option:
 
-    Currently following options are available:
+        greple -Mpw --no-clear-screen --
+
+    Currently following configuration options are available:
 
         clear_clipboard
         clear_string
@@ -91,6 +94,7 @@ this as well:
         goto_home
         browser
         timeout
+        debug
         parse_matrix
         parse_id
         parse_pw
@@ -103,21 +107,20 @@ this as well:
         pw_color
         pw_label_color
         pw_blackout
-        debug
 
-    Passwords are not blacked out when **pw\_blackout** is 0.  If it is 1, all
-    password characters are replaced by 'x'.  If it is greater than 1,
-    passwords are replaced by a sequence of 'x' characters of that length.
+    These parameters can also be used as command-line options with underscores 
+    replaced by hyphens (e.g., **--parse-matrix**, **--id-keys**).
 
-    **id\_keys** and **pw\_keys** are lists, and list members are separated by
-    whitespaces.  When the value starts with the '**+**' mark, it is appended to the
-    current list.
+    **id\_keys** and **pw\_keys** are lists of keywords separated by spaces.
+    **pw\_blackout** controls password display: 0=show, 1=mask with 'x', >1=fixed length mask.
 
 - **pw\_status**
 
-    Print option status.  Next command displays defaults.
+    Print current configuration status. Next command displays current settings:
 
         greple -Mpw::pw_status= dummy /dev/null
+
+    This shows which parameters are set to non-default values and which are using defaults.
 
 # SEE ALSO
 

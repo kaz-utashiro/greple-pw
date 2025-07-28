@@ -159,7 +159,7 @@ use warnings;
 use utf8;
 
 use Exporter 'import';
-our @EXPORT      = qw(&pw_print &pw_epilogue &pw_status);
+our @EXPORT      = qw(&pw_print &pw_epilogue &pw_status &config);
 our %EXPORT_TAGS = ( );
 our @EXPORT_OK   = qw();
 
@@ -200,11 +200,11 @@ sub finalize {
     our($mod, $argv) = @_;
     $config->deal_with(
 	$argv,
-	"clear_clipboard!",
-	"clear_string=s",
-	"clear_screen!",
-	"clear_buffer!",
-	"goto_home!",
+	"clear_clipboard|clear-clipboard!",
+	"clear_string|clear-string=s",
+	"clear_screen|clear-screen!",
+	"clear_buffer|clear-buffer!",
+	"goto_home|goto-home!",
 	"browser=s",
 	"timeout=i",
 	"debug!",
@@ -551,10 +551,12 @@ option default \
 	--print pw_print \
 	--end pw_epilogue
 
-option --debug --config debug
+option --config --begin config($<shift>=$<shift>)
+
+option --debug --config debug 1
 
 option --timeout --config timeout
 
 option --browser --config browser
-option --chrome --config browser=chrome
-option --safari --config browser=safari
+option --chrome --browser chrome
+option --safari --browser safari

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(perl:*)",
+      "Bash(minil test:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}
