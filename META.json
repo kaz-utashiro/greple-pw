@@ -45,6 +45,7 @@
             "App::Greple" : "9.23",
             "Clipboard" : "0",
             "Getopt::EX" : "v2.2.2",
+            "Getopt::EX::Config" : "0.9904",
             "perl" : "v5.18.2"
          }
       },
