@@ -317,11 +317,11 @@ my $config = Getopt::EX::Config->new(
     parse_matrix    => \$App::Greple::PwBlock::parse_matrix,
     parse_id        => \$App::Greple::PwBlock::parse_id,
     parse_pw        => \$App::Greple::PwBlock::parse_pw,
-    id_keys         => undef,  # Array parameter handled in deal_with
+    id_keys         => \$App::Greple::PwBlock::id_keys,
     id_chars        => \$App::Greple::PwBlock::id_chars,
     id_color        => \$App::Greple::PwBlock::id_color,
     id_label_color  => \$App::Greple::PwBlock::id_label_color,
-    pw_keys         => undef,  # Array parameter handled in deal_with
+    pw_keys         => \$App::Greple::PwBlock::pw_keys,
     pw_chars        => \$App::Greple::PwBlock::pw_chars,
     pw_color        => \$App::Greple::PwBlock::pw_color,
     pw_label_color  => \$App::Greple::PwBlock::pw_label_color,
@@ -351,15 +351,11 @@ sub finalize {
 	"pw_color|pw-color=s",
 	"pw_label_color|pw-label-color=s",
 	"pw_blackout|pw-blackout!",
-	# Array parameters
-	"id_keys|id-keys=s" => sub { @App::Greple::PwBlock::id_keys = split /\s+/, $_[1]; },
-	"pw_keys|pw-keys=s" => sub { @App::Greple::PwBlock::pw_keys = split /\s+/, $_[1]; },
+	"id_keys|id-keys=s",
+	"pw_keys|pw-keys=s",
     );
     
-    # Reference-based parameters are automatically managed by Getopt::EX::Config
-    # Array parameters still need explicit handling for split operation
-    @App::Greple::PwBlock::id_keys = split /\s+/, config('id_keys') if defined config('id_keys');
-    @App::Greple::PwBlock::pw_keys = split /\s+/, config('pw_keys') if defined config('pw_keys');
+    # All parameters are automatically managed by Getopt::EX::Config references
 }
 
 sub pw_status {

@@ -78,7 +78,7 @@ sub make_pattern {
     qr{ ^\s*+ (?!@except) .*? (?:@match)\w*[:=]? [\ \t]* \K ( .* ) }mxi;
 }
 
-our @id_keys = (
+our $id_keys = join(' ', 
     qw(ID ACCOUNT USER CODE NUMBER URL),
     qw(ユーザ アカウント コード 番号),
     );
@@ -89,7 +89,7 @@ our $id_label_color = 'S;C/555';
 sub parse_id {
     shift->parse_xx(
 	hash => 'id',
-	pattern => make_pattern(@id_keys),
+	pattern => make_pattern(split /\s+/, $id_keys),
 	chars => $id_chars,
 	start_label => '0',
 	label_format => '[%s]',
@@ -99,7 +99,7 @@ sub parse_id {
 	);
 }		   
 
-our @pw_keys = (
+our $pw_keys = join(' ',
     qw(PASS PIN),
     qw(パス 暗証),
     );
@@ -111,7 +111,7 @@ our $pw_blackout = 1;
 sub parse_pw {
     shift->parse_xx(
 	hash => 'pw',
-	pattern => make_pattern({IGNORE => [ 'URL' ]}, @pw_keys),
+	pattern => make_pattern({IGNORE => [ 'URL' ]}, split /\s+/, $pw_keys),
 	chars => $pw_chars,
 	start_label => 'a',
 	label_format => '[%s]',
