@@ -90,6 +90,10 @@ or:
 
     greple -Mpw --config clear_screen=0 --
 
+or as a command-line option:
+
+    greple -Mpw --no-clear-screen --
+
 Currently following configuration options are available:
 
     clear_clipboard
@@ -112,6 +116,9 @@ Currently following configuration options are available:
     pw_color
     pw_label_color
     pw_blackout
+
+These parameters can also be used as command-line options with underscores 
+replaced by hyphens (e.g., B<--parse-matrix>, B<--id-keys>).
 
 B<id_keys> and B<pw_keys> are lists of keywords separated by spaces.
 B<pw_blackout> controls password display: 0=show, 1=mask with 'x', >1=fixed length mask.
@@ -201,34 +208,35 @@ sub finalize {
 	"browser=s",
 	"timeout=i",
 	"debug!",
-	# PwBlock parameters
-	"parse_matrix!",
-	"parse_id!",
-	"parse_pw!",
-	"id_keys=s",
-	"id_chars=s",
-	"id_color=s",
-	"id_label_color=s",
-	"pw_keys=s",
-	"pw_chars=s",
-	"pw_color=s",
-	"pw_label_color=s",
-	"pw_blackout=i",
+	# PwBlock parameters - direct assignment
+	"parse-matrix!" => \$App::Greple::PwBlock::parse_matrix,
+	"parse-id!" => \$App::Greple::PwBlock::parse_id,
+	"parse-pw!" => \$App::Greple::PwBlock::parse_pw,
+	"id-chars=s" => \$App::Greple::PwBlock::id_chars,
+	"id-color=s" => \$App::Greple::PwBlock::id_color,
+	"id-label-color=s" => \$App::Greple::PwBlock::id_label_color,
+	"pw-chars=s" => \$App::Greple::PwBlock::pw_chars,
+	"pw-color=s" => \$App::Greple::PwBlock::pw_color,
+	"pw-label-color=s" => \$App::Greple::PwBlock::pw_label_color,
+	"pw-blackout=i" => \$App::Greple::PwBlock::pw_blackout,
+	# Array parameters
+	"id-keys=s" => sub { @App::Greple::PwBlock::id_keys = split /\s+/, $_[1]; },
+	"pw-keys=s" => sub { @App::Greple::PwBlock::pw_keys = split /\s+/, $_[1]; },
     );
     
-    # Sync only explicitly set config values with PwBlock module variables
-    $App::Greple::PwBlock::parse_matrix    = config('parse_matrix')    if defined config('parse_matrix');
-    $App::Greple::PwBlock::parse_id        = config('parse_id')        if defined config('parse_id');
-    $App::Greple::PwBlock::parse_pw        = config('parse_pw')        if defined config('parse_pw');
-    @App::Greple::PwBlock::id_keys         = split /\s+/, config('id_keys')         if defined config('id_keys');
-    $App::Greple::PwBlock::id_chars        = config('id_chars')        if defined config('id_chars');
-    $App::Greple::PwBlock::id_color        = config('id_color')        if defined config('id_color');
-    $App::Greple::PwBlock::id_label_color  = config('id_label_color')  if defined config('id_label_color');
-    @App::Greple::PwBlock::pw_keys         = split /\s+/, config('pw_keys')         if defined config('pw_keys');
-    $App::Greple::PwBlock::pw_chars        = config('pw_chars')        if defined config('pw_chars');
-    $App::Greple::PwBlock::pw_color        = config('pw_color')        if defined config('pw_color');
-    $App::Greple::PwBlock::pw_label_color  = config('pw_label_color')  if defined config('pw_label_color');
-    $App::Greple::PwBlock::pw_blackout     = config('pw_blackout')     if defined config('pw_blackout');
+    # Copy --config values to PwBlock variables if set
+    $App::Greple::PwBlock::parse_matrix = config('parse_matrix') if defined config('parse_matrix');
+    $App::Greple::PwBlock::parse_id = config('parse_id') if defined config('parse_id');
+    $App::Greple::PwBlock::parse_pw = config('parse_pw') if defined config('parse_pw');
+    $App::Greple::PwBlock::id_chars = config('id_chars') if defined config('id_chars');
+    $App::Greple::PwBlock::id_color = config('id_color') if defined config('id_color');
+    $App::Greple::PwBlock::id_label_color = config('id_label_color') if defined config('id_label_color');
+    $App::Greple::PwBlock::pw_chars = config('pw_chars') if defined config('pw_chars');
+    $App::Greple::PwBlock::pw_color = config('pw_color') if defined config('pw_color');
+    $App::Greple::PwBlock::pw_label_color = config('pw_label_color') if defined config('pw_label_color');
+    $App::Greple::PwBlock::pw_blackout = config('pw_blackout') if defined config('pw_blackout');
+    @App::Greple::PwBlock::id_keys = split /\s+/, config('id_keys') if defined config('id_keys');
+    @App::Greple::PwBlock::pw_keys = split /\s+/, config('pw_keys') if defined config('pw_keys');
 }
 
 sub pw_status {
