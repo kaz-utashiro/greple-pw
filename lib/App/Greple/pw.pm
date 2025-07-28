@@ -551,7 +551,7 @@ option default \
 	--print pw_print \
 	--end pw_epilogue
 
-option --config --begin config($<shift>=$<shift>)
+option --config --prologue config($<shift>=$<shift>)
 
 option --debug --config debug 1
 

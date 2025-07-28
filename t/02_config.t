@@ -15,12 +15,9 @@ my $test_data = "User: testuser\nPassword: secret123\n";
 my $config_result = pw(qw(--config clear_screen=0 -- -c User))->setstdin($test_data)->run;
 is($config_result->{result} >> 8, 0, "--config parameter works");
 
-# Test module config syntax (skip for now as it has different syntax)
-SKIP: {
-    skip "Module config syntax needs investigation", 1;
-    my $module_config_result = pw('::config=debug=1', '-c', 'User')->setstdin($test_data)->run;
-    is($module_config_result->{result} >> 8, 0, "module config syntax works");
-}
+# Module config syntax (::config=) cannot be tested with current Util.pm design
+# pw() function adds arguments after '-Mpw', but ::config= needs to be part of module name
+# This would require: greple -Mpw::config=debug=1 (not: greple -Mpw ::config=debug=1)
 
 # Test multiple config parameters
 my $multi_config_result = pw(qw(--config clear_screen=0 --config debug=1 -- -c User))->setstdin($test_data)->run;
