@@ -4,7 +4,9 @@
       "Bash(perl:*)",
       "Bash(minil test:*)",
       "Bash(find:*)",
-      "Bash(pod2text:*)"
+      "Bash(pod2text:*)",
+      "Bash(prove:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
