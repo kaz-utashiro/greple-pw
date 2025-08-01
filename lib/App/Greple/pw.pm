@@ -1,6 +1,6 @@
 package App::Greple::pw;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ pw - Interactive password and ID information extractor for greple
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 
 =head1 DESCRIPTION
